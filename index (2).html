@@ -1,0 +1,2009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CampusRide | Smart Campus Commute</title>
+
+<style>
+
+/* =====================================================
+   GLOBAL
+===================================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    background:#060914;
+    color:white;
+    min-height:100vh;
+    overflow-x:hidden;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    width:500px;
+    height:500px;
+    border-radius:50%;
+    background:rgba(0,210,255,.10);
+    filter:blur(120px);
+    top:-200px;
+    left:-150px;
+    z-index:-1;
+}
+
+body::after{
+    content:"";
+    position:fixed;
+    width:500px;
+    height:500px;
+    border-radius:50%;
+    background:rgba(130,50,255,.10);
+    filter:blur(120px);
+    right:-200px;
+    bottom:-200px;
+    z-index:-1;
+}
+
+/* =====================================================
+   NAVBAR
+===================================================== */
+
+nav{
+    height:75px;
+    width:100%;
+    padding:0 7%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    position:sticky;
+    top:0;
+    z-index:1000;
+
+    background:rgba(6,9,20,.78);
+    backdrop-filter:blur(18px);
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.logo{
+    font-size:25px;
+    font-weight:800;
+}
+
+.logo span{
+    color:#00d9ff;
+}
+
+.nav-links{
+    display:flex;
+    gap:30px;
+    list-style:none;
+}
+
+.nav-links a{
+    color:#aaa;
+    text-decoration:none;
+    transition:.3s;
+}
+
+.nav-links a:hover{
+    color:#00d9ff;
+}
+
+.nav-action{
+    padding:10px 18px;
+    border-radius:20px;
+    background:transparent;
+    border:1px solid #00d9ff;
+    color:#00d9ff;
+    cursor:pointer;
+}
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.hero{
+    min-height:620px;
+    padding:80px 8%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:50px;
+}
+
+.hero-text{
+    max-width:680px;
+}
+
+.badge{
+    display:inline-block;
+    padding:8px 15px;
+    border-radius:30px;
+
+    background:rgba(0,217,255,.08);
+    border:1px solid rgba(0,217,255,.25);
+
+    color:#00d9ff;
+    font-size:13px;
+    margin-bottom:20px;
+}
+
+.hero h1{
+    font-size:64px;
+    line-height:1.05;
+    margin-bottom:20px;
+}
+
+.hero h1 span{
+    color:#00d9ff;
+}
+
+.hero p{
+    color:#999;
+    font-size:18px;
+    line-height:1.7;
+    max-width:600px;
+    margin-bottom:30px;
+}
+
+.hero-buttons{
+    display:flex;
+    gap:15px;
+}
+
+.primary{
+    padding:15px 25px;
+    border:none;
+    border-radius:12px;
+    background:#00d9ff;
+    color:#031018;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.primary:hover{
+    transform:translateY(-3px);
+    box-shadow:0 12px 35px rgba(0,217,255,.2);
+}
+
+.secondary{
+    padding:15px 25px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.15);
+    background:rgba(255,255,255,.04);
+    color:white;
+    cursor:pointer;
+}
+
+/* =====================================================
+   HERO PHONE CARD
+===================================================== */
+
+.phone-card{
+    width:360px;
+    padding:25px;
+
+    border-radius:28px;
+
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.1);
+
+    backdrop-filter:blur(20px);
+
+    box-shadow:0 30px 90px rgba(0,0,0,.4);
+
+    animation:float 4s ease-in-out infinite;
+}
+
+@keyframes float{
+
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-12px);
+    }
+
+}
+
+.phone-top{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:25px;
+}
+
+.live{
+    color:#4dff9b;
+    font-size:12px;
+}
+
+.route-box{
+    padding:20px;
+    border-radius:18px;
+    background:rgba(0,0,0,.2);
+}
+
+.route-line{
+    display:flex;
+    gap:15px;
+}
+
+.route-dots{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.circle{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:#00d9ff;
+}
+
+.line{
+    height:45px;
+    border-left:2px dashed #00d9ff;
+}
+
+.route-text p{
+    color:#777;
+    font-size:11px;
+}
+
+.route-text h3{
+    margin:4px 0 18px;
+}
+
+.ride-preview{
+    display:flex;
+    justify-content:space-between;
+    margin-top:20px;
+    padding-top:18px;
+    border-top:1px solid rgba(255,255,255,.08);
+}
+
+/* =====================================================
+   STATS
+===================================================== */
+
+.stats{
+    padding:20px 8% 70px;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+}
+
+.stat{
+    padding:25px;
+    text-align:center;
+
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:18px;
+}
+
+.stat h2{
+    color:#00d9ff;
+    font-size:30px;
+}
+
+.stat p{
+    color:#777;
+    margin-top:5px;
+}
+
+/* =====================================================
+   SECTION
+===================================================== */
+
+.section{
+    padding:90px 8%;
+}
+
+.heading{
+    text-align:center;
+    margin-bottom:45px;
+}
+
+.heading h2{
+    font-size:42px;
+    margin-bottom:10px;
+}
+
+.heading p{
+    color:#888;
+}
+
+/* =====================================================
+   CHOICE CARDS
+===================================================== */
+
+.choice-container{
+    max-width:950px;
+    margin:auto;
+
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:25px;
+}
+
+.choice{
+    padding:35px;
+
+    border-radius:22px;
+
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.1);
+
+    cursor:pointer;
+    transition:.35s;
+}
+
+.choice:hover{
+    transform:translateY(-7px);
+    border-color:#00d9ff;
+}
+
+.choice-icon{
+    font-size:45px;
+    margin-bottom:20px;
+}
+
+.choice h3{
+    font-size:25px;
+    margin-bottom:10px;
+}
+
+.choice p{
+    color:#888;
+    line-height:1.6;
+}
+
+.choice button{
+    margin-top:20px;
+    padding:12px 20px;
+
+    border-radius:10px;
+    border:1px solid #00d9ff;
+
+    background:transparent;
+    color:#00d9ff;
+
+    cursor:pointer;
+}
+
+/* =====================================================
+   FORM
+===================================================== */
+
+.form-wrapper{
+    max-width:1000px;
+    margin:auto;
+
+    padding:35px;
+
+    border-radius:25px;
+
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.1);
+
+    backdrop-filter:blur(15px);
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.input-box{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.input-box label{
+    color:#aaa;
+    font-size:14px;
+}
+
+.input-box input,
+.input-box select{
+
+    padding:14px;
+
+    background:#0c1221;
+    color:white;
+
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:10px;
+
+    outline:none;
+}
+
+.input-box input:focus,
+.input-box select:focus{
+    border-color:#00d9ff;
+}
+
+.full{
+    grid-column:1/-1;
+}
+
+/* =====================================================
+   VEHICLE SELECT
+===================================================== */
+
+.vehicle-options{
+    display:flex;
+    gap:12px;
+}
+
+.vehicle{
+    flex:1;
+
+    padding:14px;
+
+    border-radius:10px;
+
+    background:#0c1221;
+    border:1px solid rgba(255,255,255,.1);
+
+    color:#aaa;
+    cursor:pointer;
+}
+
+.vehicle.selected{
+    border-color:#00d9ff;
+    color:#00d9ff;
+    background:rgba(0,217,255,.07);
+}
+
+.submit{
+    width:100%;
+    margin-top:25px;
+
+    padding:17px;
+
+    border:none;
+    border-radius:12px;
+
+    background:#00d9ff;
+    color:#031018;
+
+    font-size:16px;
+    font-weight:bold;
+
+    cursor:pointer;
+}
+
+/* =====================================================
+   RIDES
+===================================================== */
+
+.rides{
+    max-width:1000px;
+    margin:50px auto 0;
+}
+
+.ride-card{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+
+    padding:22px;
+    margin-bottom:15px;
+
+    border-radius:18px;
+
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+
+    animation:appear .4s ease;
+
+    transition:.3s;
+}
+
+.ride-card:hover{
+    transform:translateY(-3px);
+    border-color:rgba(0,217,255,.35);
+}
+
+@keyframes appear{
+
+    from{
+        opacity:0;
+        transform:translateY(15px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+.driver{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.avatar{
+
+    width:52px;
+    height:52px;
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:linear-gradient(135deg,#00d9ff,#7b2cff);
+
+    font-weight:bold;
+}
+
+.driver p{
+    color:#777;
+    font-size:13px;
+    margin-top:5px;
+}
+
+.ride-details{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+
+    color:#aaa;
+    font-size:14px;
+}
+
+.request-btn{
+
+    padding:11px 18px;
+
+    border:1px solid #00d9ff;
+
+    border-radius:9px;
+
+    background:transparent;
+
+    color:#00d9ff;
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+.request-btn:hover{
+    background:#00d9ff;
+    color:#061019;
+}
+
+/* =====================================================
+   MY RIDE
+===================================================== */
+
+.my-ride{
+    max-width:1000px;
+    margin:30px auto;
+    display:none;
+}
+
+.my-ride-box{
+
+    padding:25px;
+
+    border-radius:20px;
+
+    background:rgba(0,217,255,.05);
+
+    border:1px solid rgba(0,217,255,.25);
+}
+
+.my-ride-header{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:20px;
+}
+
+.status{
+    color:#4dff9b;
+}
+
+/* =====================================================
+   HOW IT WORKS
+===================================================== */
+
+.steps{
+
+    max-width:1000px;
+    margin:auto;
+
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+
+    gap:20px;
+}
+
+.step{
+
+    padding:30px;
+    text-align:center;
+
+    background:rgba(255,255,255,.04);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:20px;
+}
+
+.step-number{
+
+    width:55px;
+    height:55px;
+
+    margin:0 auto 20px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:#00d9ff;
+    color:#031018;
+
+    font-size:20px;
+    font-weight:bold;
+}
+
+.step p{
+    color:#888;
+    line-height:1.5;
+    margin-top:10px;
+}
+
+/* =====================================================
+   POPUP
+===================================================== */
+
+.popup{
+
+    position:fixed;
+    inset:0;
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(0,0,0,.75);
+
+    z-index:5000;
+}
+
+.popup-box{
+
+    width:380px;
+    max-width:90%;
+
+    padding:35px;
+
+    text-align:center;
+
+    border-radius:22px;
+
+    background:#101727;
+
+    border:1px solid rgba(255,255,255,.1);
+
+    animation:popup .3s ease;
+}
+
+@keyframes popup{
+
+    from{
+        transform:scale(.8);
+        opacity:0;
+    }
+
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
+
+}
+
+.popup-box h2{
+    margin-bottom:12px;
+}
+
+.popup-box p{
+    color:#999;
+    line-height:1.6;
+    margin-bottom:20px;
+}
+
+.close{
+    padding:11px 25px;
+
+    border:none;
+    border-radius:9px;
+
+    background:#00d9ff;
+
+    cursor:pointer;
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+footer{
+
+    padding:40px 8%;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+    text-align:center;
+
+    color:#777;
+}
+
+footer span{
+    color:#00d9ff;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:800px){
+
+    .nav-links{
+        display:none;
+    }
+
+    .hero{
+        flex-direction:column;
+        text-align:center;
+    }
+
+    .hero h1{
+        font-size:43px;
+    }
+
+    .hero-buttons{
+        justify-content:center;
+    }
+
+    .phone-card{
+        width:100%;
+        max-width:360px;
+    }
+
+    .stats{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .choice-container{
+        grid-template-columns:1fr;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .full{
+        grid-column:auto;
+    }
+
+    .steps{
+        grid-template-columns:1fr;
+    }
+
+    .ride-card{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+
+<!-- =====================================================
+     NAVBAR
+===================================================== -->
+
+<nav>
+
+    <div class="logo">
+        Campus<span>Ride</span> 🚀
+    </div>
+
+    <ul class="nav-links">
+
+        <li>
+            <a href="#home">Home</a>
+        </li>
+
+        <li>
+            <a href="#find">Find Ride</a>
+        </li>
+
+        <li>
+            <a href="#offer">Offer Ride</a>
+        </li>
+
+        <li>
+            <a href="#how">How It Works</a>
+        </li>
+
+    </ul>
+
+    <button class="nav-action"
+            onclick="goTo('find')">
+
+        Get Started
+
+    </button>
+
+</nav>
+
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<section class="hero" id="home">
+
+    <div class="hero-text">
+
+        <div class="badge">
+            ⚡ SMART CAMPUS MOBILITY
+        </div>
+
+        <h1>
+            Share The Ride.
+            <span>Save The Journey.</span>
+        </h1>
+
+        <p>
+            CampusRide connects day scholars travelling
+            on similar routes. Offer your empty bike or
+            car seat, or find someone who can give you a ride.
+        </p>
+
+        <div class="hero-buttons">
+
+            <button class="primary"
+                    onclick="goTo('find')">
+
+                🔎 Find a Ride
+
+            </button>
+
+            <button class="secondary"
+                    onclick="goTo('offer')">
+
+                🏍️ Offer My Seat
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- PHONE PREVIEW -->
+
+    <div class="phone-card">
+
+        <div class="phone-top">
+
+            <strong>Live Ride</strong>
+
+            <span class="live">
+                ● AVAILABLE
+            </span>
+
+        </div>
+
+        <div class="route-box">
+
+            <div class="route-line">
+
+                <div class="route-dots">
+
+                    <div class="circle"></div>
+
+                    <div class="line"></div>
+
+                    <div class="circle"></div>
+
+                </div>
+
+                <div class="route-text">
+
+                    <p>FROM</p>
+                    <h3>Phagwara</h3>
+
+                    <p>TO</p>
+                    <h3>Campus</h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="ride-preview">
+
+            <span>🏍️ Bike</span>
+
+            <span>💺 1 Seat</span>
+
+            <strong>96%</strong>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     STATS
+===================================================== -->
+
+<section class="stats">
+
+    <div class="stat">
+        <h2>1.2K+</h2>
+        <p>Students</p>
+    </div>
+
+    <div class="stat">
+        <h2>430+</h2>
+        <p>Daily Rides</p>
+    </div>
+
+    <div class="stat">
+        <h2>89%</h2>
+        <p>Match Rate</p>
+    </div>
+
+    <div class="stat">
+        <h2>24/7</h2>
+        <p>Ride Requests</p>
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     CHOOSE
+===================================================== -->
+
+<section class="section">
+
+    <div class="heading">
+
+        <h2>What Do You Need?</h2>
+
+        <p>
+            Choose how you want to use CampusRide.
+        </p>
+
+    </div>
+
+
+    <div class="choice-container">
+
+
+        <div class="choice"
+             onclick="goTo('find')">
+
+            <div class="choice-icon">
+                🔵
+            </div>
+
+            <h3>I Need a Ride</h3>
+
+            <p>
+                Find a student travelling on your route
+                who has an available seat in their car or bike.
+            </p>
+
+            <button>
+                Find Ride →
+            </button>
+
+        </div>
+
+
+        <div class="choice"
+             onclick="goTo('offer')">
+
+            <div class="choice-icon">
+                🟢
+            </div>
+
+            <h3>I Have a Ride</h3>
+
+            <p>
+                Have an empty seat on your bike or car?
+                Post your ride and help another student commute.
+            </p>
+
+            <button>
+                Offer My Seat →
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     FIND RIDE
+===================================================== -->
+
+<section class="section" id="find">
+
+    <div class="heading">
+
+        <h2>🔎 Find a Ride</h2>
+
+        <p>
+            Tell us your route and we'll find compatible riders.
+        </p>
+
+    </div>
+
+
+    <div class="form-wrapper">
+
+        <div class="form-grid">
+
+
+            <div class="input-box">
+
+                <label>Your Name</label>
+
+                <input
+                    type="text"
+                    id="findName"
+                    placeholder="Enter your name">
+
+            </div>
+
+
+            <div class="input-box">
+
+                <label>Starting Location</label>
+
+                <input
+                    type="text"
+                    id="findFrom"
+                    placeholder="e.g. Phagwara">
+
+            </div>
+
+
+            <div class="input-box">
+
+                <label>Destination</label>
+
+                <input
+                    type="text"
+                    id="findTo"
+                    placeholder="e.g. Campus">
+
+            </div>
+
+
+            <div class="input-box">
+
+                <label>Travel Time</label>
+
+                <input
+                    type="time"
+                    id="findTime">
+
+            </div>
+
+
+            <div class="input-box full">
+
+                <label>Preferred Vehicle</label>
+
+                <div class="vehicle-options">
+
+                    <button class="vehicle selected"
+                            onclick="selectFindVehicle(this,'Bike')">
+
+                        🏍️ Bike
+
+                    </button>
+
+                    <button class="vehicle"
+                            onclick="selectFindVehicle(this,'Car')">
+
+                        🚗 Car
+
+                    </button>
+
+                    <button class="vehicle"
+                            onclick="selectFindVehicle(this,'Any')">
+
+                        ✨ Any
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <button class="submit"
+                onclick="findRide()">
+
+            🔎 FIND MATCHING RIDES
+
+        </button>
+
+    </div>
+
+
+    <div class="rides"
+         id="findResults">
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     OFFER RIDE
+===================================================== -->
+
+<section class="section" id="offer">
+
+    <div class="heading">
+
+        <h2>🟢 Offer Your Ride</h2>
+
+        <p>
+            Got an empty seat? Share it with a fellow student.
+        </p>
+
+    </div>
+
+
+    <div class="form-wrapper">
+
+        <div class="form-grid">
+
+
+            <div class="input-box">
+
+                <label>Your Name</label>
+
+                <input
+                    type="text"
+                    id="offerName"
+                    placeholder="Enter your name">
+
+            </div>
+
+
+            <div class="input-box">
+
+                <label>Starting Location</label>
+
+                <input
+                    type="text"
+                    id="offerFrom"
+                    placeholder="e.g. Phagwara">
+
+            </div>
+
+
+            <div class="input-box">
+
+                <label>Destination</label>
+
+                <input
+                    type="text"
+                    id="offerTo"
+                    placeholder="e.g. Campus">
+
+            </div>
+
+
+            <div class="input-box">
+
+                <label>Departure Time</label>
+
+                <input
+                    type="time"
+                    id="offerTime">
+
+            </div>
+
+
+            <div class="input-box">
+
+                <label>Vehicle</label>
+
+                <div class="vehicle-options">
+
+                    <button
+                        class="vehicle selected"
+                        onclick="selectOfferVehicle(this,'Bike')">
+
+                        🏍️ Bike
+
+                    </button>
+
+                    <button
+                        class="vehicle"
+                        onclick="selectOfferVehicle(this,'Car')">
+
+                        🚗 Car
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="input-box">
+
+                <label>Available Seats</label>
+
+                <select id="offerSeats">
+
+                    <option value="1">1 Seat</option>
+                    <option value="2">2 Seats</option>
+                    <option value="3">3 Seats</option>
+                    <option value="4">4 Seats</option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <button class="submit"
+                onclick="postRide()">
+
+            🚀 POST MY RIDE
+
+        </button>
+
+    </div>
+
+
+    <!-- MY RIDE -->
+
+    <div class="my-ride"
+         id="myRide">
+
+        <div class="my-ride-box">
+
+            <div class="my-ride-header">
+
+                <h3>
+                    🚀 Your Ride is Live
+                </h3>
+
+                <span class="status">
+                    ● ACTIVE
+                </span>
+
+            </div>
+
+            <div id="myRideDetails">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     HOW IT WORKS
+===================================================== -->
+
+<section class="section" id="how">
+
+    <div class="heading">
+
+        <h2>How CampusRide Works</h2>
+
+        <p>
+            Simple. Smart. Student-friendly.
+        </p>
+
+    </div>
+
+
+    <div class="steps">
+
+
+        <div class="step">
+
+            <div class="step-number">
+                01
+            </div>
+
+            <h3>Post or Search</h3>
+
+            <p>
+                Offer your empty seat or search for
+                someone travelling your route.
+            </p>
+
+        </div>
+
+
+        <div class="step">
+
+            <div class="step-number">
+                02
+            </div>
+
+            <h3>Smart Match</h3>
+
+            <p>
+                Our system compares route, vehicle
+                and travel time to find the best match.
+            </p>
+
+        </div>
+
+
+        <div class="step">
+
+            <div class="step-number">
+                03
+            </div>
+
+            <h3>Connect</h3>
+
+            <p>
+                Send a request and coordinate your
+                daily campus commute.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer>
+
+    <p>
+        © 2026 <span>CampusRide</span> —
+        Smart Campus Commuter Matcher
+    </p>
+
+</footer>
+
+
+<!-- =====================================================
+     POPUP
+===================================================== -->
+
+<div class="popup" id="popup">
+
+    <div class="popup-box">
+
+        <h2 id="popupTitle">
+            Success 🚀
+        </h2>
+
+        <p id="popupMessage">
+            Your request has been sent.
+        </p>
+
+        <button class="close"
+                onclick="closePopup()">
+
+            Okay
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   DEFAULT DATA
+===================================================== */
+
+let postedRides = [
+
+    {
+        name:"Rahul",
+        from:"Phagwara",
+        to:"Campus",
+        time:"08:00",
+        vehicle:"Bike",
+        seats:1
+    },
+
+    {
+        name:"Aarav",
+        from:"Phagwara",
+        to:"Campus",
+        time:"08:10",
+        vehicle:"Car",
+        seats:2
+    },
+
+    {
+        name:"Arjun",
+        from:"Jalandhar",
+        to:"Campus",
+        time:"08:00",
+        vehicle:"Car",
+        seats:3
+    },
+
+    {
+        name:"Kabir",
+        from:"Phagwara",
+        to:"Campus",
+        time:"08:15",
+        vehicle:"Bike",
+        seats:1
+    },
+
+    {
+        name:"Rohan",
+        from:"Phagwara",
+        to:"Campus",
+        time:"08:05",
+        vehicle:"Car",
+        seats:1
+    }
+
+];
+
+
+/* =====================================================
+   VEHICLE VARIABLES
+===================================================== */
+
+let findVehicle = "Bike";
+
+let offerVehicle = "Bike";
+
+
+/* =====================================================
+   FIND VEHICLE
+===================================================== */
+
+function selectFindVehicle(button,vehicle){
+
+    document
+        .querySelectorAll("#find .vehicle")
+        .forEach(btn=>{
+            btn.classList.remove("selected");
+        });
+
+    button.classList.add("selected");
+
+    findVehicle = vehicle;
+}
+
+
+/* =====================================================
+   OFFER VEHICLE
+===================================================== */
+
+function selectOfferVehicle(button,vehicle){
+
+    document
+        .querySelectorAll("#offer .vehicle")
+        .forEach(btn=>{
+            btn.classList.remove("selected");
+        });
+
+    button.classList.add("selected");
+
+    offerVehicle = vehicle;
+}
+
+
+/* =====================================================
+   FIND RIDE
+===================================================== */
+
+function findRide(){
+
+    const name =
+        document.getElementById("findName").value.trim();
+
+    const from =
+        document.getElementById("findFrom").value.trim();
+
+    const to =
+        document.getElementById("findTo").value.trim();
+
+    const time =
+        document.getElementById("findTime").value;
+
+
+    if(!name || !from || !to || !time){
+
+        showPopup(
+            "Missing Details",
+            "Please fill all the details first."
+        );
+
+        return;
+    }
+
+
+    let matches = postedRides.filter(ride=>{
+
+        if(ride.seats <= 0)
+            return false;
+
+        if(
+            findVehicle !== "Any"
+            &&
+            ride.vehicle !== findVehicle
+        ){
+            return false;
+        }
+
+        return true;
+
+    });
+
+
+    matches = matches.map(ride=>{
+
+        let score = 60;
+
+
+        /* Route match */
+
+        if(
+            ride.from.toLowerCase()
+            ===
+            from.toLowerCase()
+        ){
+
+            score += 20;
+
+        }
+
+
+        /* Destination match */
+
+        if(
+            ride.to.toLowerCase()
+            ===
+            to.toLowerCase()
+        ){
+
+            score += 15;
+
+        }
+
+
+        /* Time match */
+
+        if(
+            Math.abs(
+                timeToMinutes(ride.time)
+                -
+                timeToMinutes(time)
+            ) <= 15
+        ){
+
+            score += 5;
+
+        }
+
+
+        score = Math.min(score,99);
+
+
+        return {
+            ...ride,
+            score:score
+        };
+
+    });
+
+
+    matches.sort(
+        (a,b)=>b.score-a.score
+    );
+
+
+    displayRides(matches);
+
+}
+
+
+/* =====================================================
+   DISPLAY RIDES
+===================================================== */
+
+function displayRides(matches){
+
+    const container =
+        document.getElementById("findResults");
+
+
+    if(matches.length === 0){
+
+        container.innerHTML = `
+
+            <div class="form-wrapper">
+
+                <h3>
+                    😔 No rides found
+                </h3>
+
+                <p style="color:#888;margin-top:10px">
+
+                    Try another vehicle type,
+                    route or time.
+
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    let html = `
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            margin-bottom:20px;
+        ">
+
+            <h2>
+                🎯 Available Matches
+            </h2>
+
+            <span style="color:#00d9ff">
+                ${matches.length} rides
+            </span>
+
+        </div>
+
+    `;
+
+
+    matches.forEach(ride=>{
+
+        html += `
+
+            <div class="ride-card">
+
+                <div class="driver">
+
+                    <div class="avatar">
+
+                        ${ride.name.charAt(0)}
+
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            ${ride.name}
+                        </h3>
+
+                        <p>
+                            ${ride.vehicle === "Bike"
+                                ? "🏍️ Bike Share"
+                                : "🚗 Carpool"}
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="ride-details">
+
+                    <span>
+                        📍 ${ride.from}
+                    </span>
+
+                    <span>
+                        🎓 ${ride.to}
+                    </span>
+
+                    <span>
+                        ⏰ ${ride.time}
+                    </span>
+
+                    <span>
+                        💺 ${ride.seats} seat(s)
+                    </span>
+
+                    <strong style="color:#4dff9b">
+                        ${ride.score}% Match
+                    </strong>
+
+                </div>
+
+
+                <button
+                    class="request-btn"
+                    onclick="requestSeat('${ride.name}')">
+
+                    Request Seat
+
+                </button>
+
+            </div>
+
+        `;
+
+    });
+
+
+    container.innerHTML = html;
+
+}
+
+
+/* =====================================================
+   REQUEST SEAT
+===================================================== */
+
+function requestSeat(name){
+
+    showPopup(
+        "Request Sent 🚀",
+        "Your seat request has been sent to "
+        + name
+        + ". You can coordinate your ride with them."
+    );
+
+}
+
+
+/* =====================================================
+   POST RIDE
+===================================================== */
+
+function postRide(){
+
+    const name =
+        document.getElementById("offerName").value.trim();
+
+    const from =
+        document.getElementById("offerFrom").value.trim();
+
+    const to =
+        document.getElementById("offerTo").value.trim();
+
+    const time =
+        document.getElementById("offerTime").value;
+
+    const seats =
+        parseInt(
+            document.getElementById("offerSeats").value
+        );
+
+
+    if(!name || !from || !to || !time){
+
+        showPopup(
+            "Missing Details",
+            "Please fill all the ride details first."
+        );
+
+        return;
+    }
+
+
+    const newRide = {
+
+        name:name,
+
+        from:from,
+
+        to:to,
+
+        time:time,
+
+        vehicle:offerVehicle,
+
+        seats:seats
+
+    };
+
+
+    postedRides.push(newRide);
+
+
+    /* Show own ride */
+
+    const myRide =
+        document.getElementById("myRide");
+
+    const details =
+        document.getElementById("myRideDetails");
+
+
+    details.innerHTML = `
+
+        <div class="ride-details">
+
+            <span>
+                👤 ${name}
+            </span>
+
+            <span>
+                📍 ${from} → ${to}
+            </span>
+
+            <span>
+                ⏰ ${time}
+            </span>
+
+            <span>
+                ${offerVehicle === "Bike"
+                    ? "🏍️ Bike"
+                    : "🚗 Car"}
+            </span>
+
+            <span>
+                💺 ${seats} Seat(s) Available
+            </span>
+
+        </div>
+
+    `;
+
+
+    myRide.style.display = "block";
+
+
+    showPopup(
+        "Ride Posted Successfully 🚀",
+        "Your ride is now visible to students looking for a matching commute."
+    );
+
+
+    /* Reset form */
+
+    document.getElementById("offerName").value = "";
+
+    document.getElementById("offerFrom").value = "";
+
+    document.getElementById("offerTo").value = "";
+
+    document.getElementById("offerTime").value = "";
+
+}
+
+
+/* =====================================================
+   TIME CONVERTER
+===================================================== */
+
+function timeToMinutes(time){
+
+    if(!time)
+        return 0;
+
+    const parts = time.split(":");
+
+    return (
+        parseInt(parts[0]) * 60
+        +
+        parseInt(parts[1])
+    );
+
+}
+
+
+/* =====================================================
+   POPUP
+===================================================== */
+
+function showPopup(title,message){
+
+    document.getElementById("popupTitle")
+        .innerText = title;
+
+    document.getElementById("popupMessage")
+        .innerText = message;
+
+    document.getElementById("popup")
+        .style.display = "flex";
+
+}
+
+
+function closePopup(){
+
+    document.getElementById("popup")
+        .style.display = "none";
+
+}
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+function goTo(id){
+
+    document
+        .getElementById(id)
+        .scrollIntoView({
+            behavior:"smooth"
+        });
+
+}
+
+</script>
+
+</body>
+</html>
